@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PlumCraft Launcher — Minecraft: Java Edition</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<header>
+  <div class="brand"><span class="cube"></span><div><strong>PlumCraft</strong><small>Minecraft: Java Edition Launcher</small></div></div>
+  <div id="accountBox" class="account">Memuat akun…</div>
+</header>
+<nav>
+  <button data-view="versions" class="active">Versi</button>
+  <button data-view="instances">Instance Saya</button>
+  <button data-view="diagnostics">Diagnostik</button>
+</nav>
+<main>
+  <section id="view-versions">
+    <div class="bar">
+      <input id="q" type="search" placeholder="Cari versi, mis. 1.21…">
+      <select id="type"><option value="all">Semua tipe</option><option value="release">Release</option><option value="snapshot">Snapshot</option><option value="old_beta">Old beta</option><option value="old_alpha">Old alpha</option></select>
+      <button id="reloadVersions">Muat ulang</button>
+    </div>
+    <p id="latestInfo" class="muted"></p>
+    <div id="versionList" class="grid"></div>
+  </section>
+
+  <section id="view-instances" hidden>
+    <form id="createForm" class="card">
+      <h2>Instance baru</h2>
+      <label>Nama <input name="name" required maxlength="40" placeholder="Mis. Survival 1.21"></label>
+      <label>Versi <input name="versionId" required placeholder="Mis. 1.21.4 (harus ada di manifest)"></label>
+      <label>RAM (MB) <input name="ramMb" type="number" value="2048" min="512" step="256"></label>
+      <label>Resolusi <span class="row"><input name="width" type="number" value="854"> × <input name="height" type="number" value="480"></span></label>
+      <label>Path Java (opsional) <input name="javaPath" placeholder="Kosongkan: runtime resmi Mojang / Java sistem"></label>
+      <label>JVM args ekstra (opsional) <input name="jvmArgs" placeholder="-XX:+UseG1GC"></label>
+      <label>Client / Loader
+        <select name="loader">
+          <option value="vanilla">Vanilla (tanpa client)</option>
+          <option value="plumclient">PlumClient — Xray, AutoBright, AutoClick, ESP, Tracers, Chest Finder, Scaffold, AutoTool, Discord RPC, KillAura, Velocity, Sprint, AutoArmor, Freecam, TPS (Minecraft 1.21.4)</option>
+        </select>
+      </label>
+      <label>Versi Fabric Loader (opsional) <input name="loaderVersion" placeholder="Kosongkan = stabil terbaru"></label>
+      <fieldset>
+        <legend>PlumClient (berlaku bila loader PlumClient)</legend>
+        <label>Cari setting <input type="search" data-client-search placeholder="Ketik nama modul/setting…"></label>
+        <label><input type="checkbox" name="c_xrayEnabled"> Xray aktif saat masuk game (hotkey X)</label>
+        <label>Preset kategori Xray <span class="row"><select data-xray-preset><option value="custom">Custom (pakai daftar bawah)</option><option value="precious">Precious</option><option value="redstone">Redstone</option><option value="nether">Nether</option><option value="all">Semua ore</option></select><button type="button" data-xray-apply>Terapkan preset</button></span></label>
+        <label><input type="checkbox" name="c_xrayHighlight" checked> Highlight ore terdekat (partikel + pelacak HUD)</label>
+        <label>Radius highlight (8-32) <input name="c_xrayRadius" type="number" value="16" min="8" max="32"></label>
+        <label>Maks highlight (1-12) <input name="c_xrayMaxHighlights" type="number" value="6" min="1" max="12"></label>
+        <label><input type="checkbox" name="c_showOreTracker" checked> Pelacak ore terdekat di HUD</label>
+        <label><input type="checkbox" name="c_autoBrightEnabled" checked> AutoBright / fullbright (hotkey B)</label>
+        <label><input type="checkbox" name="c_autoClickEnabled"> AutoClick aktif (hotkey V)</label>
+        <label>AutoClick CPS tetap (1-20, bila humanizer mati) <input name="c_autoClickCps" type="number" value="10" min="1" max="20"></label>
+        <label><input type="checkbox" name="c_autoClickHumanizer" checked> Humanizer — CPS acak 8-14 tiap klik (bukan interval tetap)</label>
+        <label>Rentang CPS humanizer (1-20) <span class="row"><input name="c_autoClickCpsMin" type="number" value="8" min="1" max="20"> – <input name="c_autoClickCpsMax" type="number" value="14" min="1" max="20"></span></label>
+        <label><input type="checkbox" name="c_autoClickSmoothAim" checked> Aim smooth + jitter sebelum klik (interpolasi, bukan snap)</label>
+        <label>Jitter aim (0-3 derajat) <input name="c_autoClickJitter" type="number" value="1" min="0" max="3" step="0.1"></label>
+        <label>Mode AutoClick
+          <select name="c_autoClickMode"><option value="attack">Attack (klik kiri ditahan)</option><option value="use">Use (klik kanan ditahan)</option><option value="both">Keduanya</option></select>
+        </label>
+        <label>Target AutoClick
+          <select name="c_autoClickTarget"><option value="either">Attack + mining (target apa pun)</option><option value="entity">Attack saja (entity)</option><option value="block">Mining saja (blok)</option></select>
+        </label>
+        <label><input type="checkbox" name="c_autoClickCooldownSync" checked> Ikut cooldown senjata untuk target entity</label>
+        <label><input type="checkbox" name="c_autoClickToolGuard" checked> Berhenti bila durability tool menipis</label>
+        <label>Batas durability tersisa (1-64) <input name="c_autoClickMinDurability" type="number" value="5" min="1" max="64"></label>
+        <label><input type="checkbox" name="c_autoWeaponEnabled"> AutoWeapon — pilih senjata terkuat di hotbar (hotkey Z)</label>
+        <label><input type="checkbox" name="c_autoBowEnabled"> AutoBow — tarik & lepas busur otomatis (hotkey C)</label>
+        <label>Jarak AutoBow (8-64) <input name="c_autoBowRange" type="number" value="32" min="8" max="64"></label>
+        <label><input type="checkbox" name="c_autoBowFullCharge" checked> AutoBow hanya lepas saat charge penuh</label>
+        <label><input type="checkbox" name="c_noFallEnabled"> NoFall — tanpa fall damage (hotkey N)</label>
+        <label><input type="checkbox" name="c_strongholdFinderEnabled"> Stronghold Finder — triangulasi Eye of Ender (hotkey G)</label>
+        <label><input type="checkbox" name="c_crosshairEnabled"> Crosshair kustom (hotkey K)</label>
+        <label>Gaya Crosshair <select name="c_crosshairStyle"><option value="cross">Cross</option><option value="dot">Dot</option><option value="circle">Circle</option><option value="crossdot">Cross + Dot</option></select></label>
+        <label>Ukuran Crosshair (4-20) <input name="c_crosshairSize" type="number" value="8" min="4" max="20"></label>
+        <label>Warna Crosshair <select name="c_crosshairColor"><option value="white">Putih</option><option value="green">Hijau</option><option value="red">Merah</option><option value="cyan">Cyan</option><option value="purple">Ungu</option><option value="yellow">Kuning</option></select></label>
+        <label><input type="checkbox" name="c_espEnabled"> ESP — outline entity tembus dinding (hotkey O)</label>
+        <label>Jarak ESP (8-128) <input name="c_espRange" type="number" value="64" min="8" max="128"></label>
+        <label>Target ESP <select name="c_espTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+        <label><input type="checkbox" name="c_tracersEnabled"> Tracers — garis ke entity (hotkey P)</label>
+        <label>Jarak Tracers (8-128) <input name="c_tracerRange" type="number" value="64" min="8" max="128"></label>
+        <label>Target Tracers <select name="c_tracerTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+        <label><input type="checkbox" name="c_chestFinderEnabled"> Chest Finder — tandai chest/barrel/shulker (hotkey U)</label>
+        <label>Radius Chest Finder (8-64) <input name="c_chestRadius" type="number" value="32" min="8" max="64"></label>
+        <label><input type="checkbox" name="c_scaffoldEnabled"> Scaffold/AutoBuild — pasang blok di bawah saat berjalan (hotkey Y)</label>
+        <label><input type="checkbox" name="c_autoToolEnabled"> AutoTool — ganti tool/senjata sesuai target, mace saat jatuh, trident di air (hotkey R)</label>
+        <label><input type="checkbox" name="c_discordRpcEnabled"> Discord Rich Presence</label>
+        <label>Discord App ID (dari Discord Developer Portal) <input name="c_discordAppId" placeholder="Kosongkan bila belum punya"></label>
+        <label><input type="checkbox" name="c_jesusEnabled"> Jesus — jalan di atas air/lava (hotkey J)</label>
+        <label><input type="checkbox" name="c_chestStealerEnabled"> Chest Stealer — sedot isi chest otomatis (hotkey ,)</label>
+        <label><input type="checkbox" name="c_antiFogEnabled"> AntiFog — hilangkan kabut (hotkey .)</label>
+        <label><input type="checkbox" name="c_chamsEnabled"> Chams — model entity tembus dinding (hotkey M)</label>
+        <label><input type="checkbox" name="c_triggerbotEnabled"> Triggerbot — attack otomatis saat bidik entity (hotkey /)</label>
+        <label><input type="checkbox" name="c_killAuraEnabled"> KillAura Advanced — serang entity otomatis (hotkey I)</label>
+        <label>Jarak serang KillAura (3-6) <input name="c_killAuraRange" type="number" value="4.5" min="3" max="6" step="0.1"></label>
+        <label>Jarak pindai KillAura (3-12) <input name="c_killAuraScanRange" type="number" value="6" min="3" max="12" step="0.1"></label>
+        <label>Target KillAura <select name="c_killAuraTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+        <label>Prioritas KillAura <select name="c_killAuraPriority"><option value="distance">Jarak terdekat</option><option value="health">Health terendah</option><option value="angle">Sudut terkecil</option><option value="hurttime">Hurt-time terendah</option></select></label>
+        <label>Mode KillAura <select name="c_killAuraMode"><option value="single">Single (fokus satu)</option><option value="switch">Switch (berganti berkala)</option><option value="multi">Multi (bergiliran tiap serangan)</option></select></label>
+        <label>Jeda ganti target Switch (0-2000 ms) <input name="c_killAuraSwitchDelayMs" type="number" value="250" min="0" max="2000"></label>
+        <label>FOV KillAura (30-360) <input name="c_killAuraFov" type="number" value="120" min="30" max="360"></label>
+        <label>Kecepatan rotasi KillAura (10-180 °/tick) <input name="c_killAuraRotationSpeed" type="number" value="60" min="10" max="180"></label>
+        <label>Batas CPS KillAura (1-20) <input name="c_killAuraCps" type="number" value="12" min="1" max="20"></label>
+        <label><input type="checkbox" name="c_killAuraThroughWalls"> KillAura boleh menyerang tembus dinding</label>
+        <label><input type="checkbox" name="c_killAuraIgnoreInvisible" checked> KillAura abaikan entity invisible</label>
+        <label><input type="checkbox" name="c_killAuraSmartCrit" checked> KillAura smart-crit (tunggu jatuh saat di udara)</label>
+        <label><input type="checkbox" name="c_killAuraRequireCooldown" checked> KillAura tunggu cooldown senjata penuh</label>
+        <label><input type="checkbox" name="c_velocityEnabled"> Velocity Advanced — kurangi knockback (hotkey L)</label>
+        <label>Mode Velocity <select name="c_velocityMode"><option value="reduce">Reduce (skala persen)</option><option value="cancel">Cancel (nol)</option></select></label>
+        <label>Velocity horizontal dipertahankan (0-100%) <input name="c_velocityHorizontal" type="number" value="20" min="0" max="100"></label>
+        <label>Velocity vertikal dipertahankan (0-100%) <input name="c_velocityVertical" type="number" value="100" min="0" max="100"></label>
+        <label>Delay Velocity (0-10 tick) <input name="c_velocityDelayTicks" type="number" value="0" min="0" max="10"></label>
+        <label><input type="checkbox" name="c_velocityJumpReset"> Velocity jump-reset saat terkena knockback di tanah</label>
+        <label>Peluang jump-reset (1-100%) <input name="c_velocityJumpResetChance" type="number" value="30" min="1" max="100"></label>
+        <label><input type="checkbox" name="c_velocityRequireMoving"> Velocity hanya saat sedang bergerak</label>
+        <label><input type="checkbox" name="c_sprintEnabled"> Sprint Advanced — sprint otomatis (hotkey ;)</label>
+        <label>Mode Sprint <select name="c_sprintMode"><option value="legit">Legit (maju saja)</option><option value="omni">Omni (semua arah)</option></select></label>
+        <label><input type="checkbox" name="c_sprintKeepSprint" checked> Sprint keep-sprint setelah menyerang</label>
+        <label><input type="checkbox" name="c_sprintWhileUsing"> Sprint tetap jalan saat memakai item</label>
+        <label><input type="checkbox" name="c_autoArmorEnabled"> AutoArmor Advanced — pasang armor terbaik (hotkey ')</label>
+        <label>Jeda AutoArmor (50-1000 ms) <input name="c_autoArmorDelayMs" type="number" value="150" min="50" max="1000"></label>
+        <label><input type="checkbox" name="c_autoArmorHotbarOnly"> AutoArmor hanya dari hotbar</label>
+        <label><input type="checkbox" name="c_autoArmorPreferElytra"> AutoArmor utamakan elytra daripada chestplate</label>
+        <label><input type="checkbox" name="c_autoArmorDropOld"> AutoArmor buang potongan lama (bukan disimpan)</label>
+        <label><input type="checkbox" name="c_freecamEnabled"> Freecam Advanced — kamera bebas (hotkey F6)</label>
+        <label>Kecepatan Freecam (0.2-3) <input name="c_freecamSpeed" type="number" value="1" min="0.2" max="3" step="0.1"></label>
+        <label><input type="checkbox" name="c_freecamFreeze" checked> Freecam bekukan pemain di tempat</label>
+        <label><input type="checkbox" name="c_freecamShowPlayer" checked> Freecam tampilkan badan pemain (third-person)</label>
+        <label><strong>Upgrade Advanced modul lama</strong></label>
+        <label><input type="checkbox" name="c_jesusAffectWater" checked> Jesus berlaku di air</label>
+        <label><input type="checkbox" name="c_jesusAffectLava" checked> Jesus berlaku di lava</label>
+        <label>Daya angkat Jesus (0.03-0.2) <input name="c_jesusLift" type="number" value="0.08" min="0.03" max="0.2" step="0.01"></label>
+        <label><input type="checkbox" name="c_xrayExposedOnly"> Xray hanya ore terbuka (sentuh udara)</label>
+        <label><input type="checkbox" name="c_xrayValuableFirst"> Xray utamakan ore berharga di pelacak</label>
+        <label>Gamma AutoBright (1-15) <input name="c_autoBrightGamma" type="number" value="15" min="1" max="15" step="0.5"></label>
+        <label><input type="checkbox" name="c_autoBrightFade" checked> AutoBright transisi gamma halus</label>
+        <label>Rentang CPS Use AutoClick (1-20) <span class="row"><input name="c_autoClickUseCpsMin" type="number" value="8" min="1" max="20"> – <input name="c_autoClickUseCpsMax" type="number" value="14" min="1" max="20"></span></label>
+        <label>Jeda ganti senjata AutoWeapon (0-1000 ms) <input name="c_autoWeaponSwitchDelayMs" type="number" value="150" min="0" max="1000"></label>
+        <label><input type="checkbox" name="c_autoWeaponEnchantWeight" checked> AutoWeapon timbang enchantment per jenis</label>
+        <label><input type="checkbox" name="c_autoBowPredictive" checked> AutoBow aim prediktif (lead target)</label>
+        <label>Jarak jatuh minimum NoFall (2-12) <input name="c_noFallMinDistance" type="number" value="3" min="2" max="12"></label>
+        <label>Interval paket NoFall (50-500 ms) <input name="c_noFallIntervalMs" type="number" value="100" min="50" max="500"></label>
+        <label>Jarak minimum antar lemparan Stronghold (4-32) <input name="c_strongholdMinSeparation" type="number" value="8" min="4" max="32"></label>
+        <label><input type="checkbox" name="c_crosshairDynamic"> Crosshair dinamis mengikuti cooldown</label>
+        <label><input type="checkbox" name="c_crosshairHitMarker" checked> Crosshair merah saat bidik entity hidup</label>
+        <label><input type="checkbox" name="c_espShowHealth"> ESP tampilkan bar HP entity</label>
+        <label>Ketebalan garis Tracers (1-4) <input name="c_tracerThickness" type="number" value="2" min="1" max="4"></label>
+        <label><input type="checkbox" name="c_tracerVisibleOnly"> Tracers hanya entity terlihat (garis pandang)</label>
+        <label>Tipe Chest Finder <select name="c_chestFinderTypes"><option value="all">Semua kontainer</option><option value="chests">Chest saja</option><option value="barrels">Barrel saja</option><option value="shulkers">Shulker saja</option></select></label>
+        <label>Jeda pasang Scaffold (50-500 ms) <input name="c_scaffoldDelayMs" type="number" value="100" min="50" max="500"></label>
+        <label><input type="checkbox" name="c_scaffoldTower"> Scaffold mode tower (tahan lompat)</label>
+        <label>Jeda ganti tool AutoTool (0-500 ms) <input name="c_autoToolSwitchDelayMs" type="number" value="100" min="0" max="500"></label>
+        <label><input type="checkbox" name="c_autoToolPreferSilk"> AutoTool utamakan silk touch</label>
+        <label><input type="checkbox" name="c_discordShowModules"> Discord RPC tampilkan jumlah modul aktif</label>
+        <label>Jeda Chest Stealer (25-500 ms) <input name="c_chestStealerDelayMs" type="number" value="75" min="25" max="500"></label>
+        <label><input type="checkbox" name="c_chestStealerValuableOnly"> Chest Stealer hanya item berharga</label>
+        <label>Mode AntiFog <select name="c_antiFogMode"><option value="full">Full (kabut hilang)</option><option value="partial">Partial (jarak didorong)</option></select></label>
+        <label>Faktor jarak AntiFog partial (2-10) <input name="c_antiFogFactor" type="number" value="4" min="2" max="10"></label>
+        <label><input type="checkbox" name="c_chamsTint"> Chams tint merah</label>
+        <label>Target Triggerbot <select name="c_triggerbotTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+        <label>Delay Triggerbot (0-500 ms) <span class="row"><input name="c_triggerbotDelayMinMs" type="number" value="0" min="0" max="500"> – <input name="c_triggerbotDelayMaxMs" type="number" value="80" min="0" max="500"></span></label>
+        <label><input type="checkbox" name="c_hudActiveOnly"> HUD ringkas (hanya modul aktif)</label>
+        <label><strong>ClickGUI + modul baru + optimasi</strong></label>
+        <label><input type="checkbox" name="c_clickGuiEnabled" checked> ClickGUI in-game aktif (Right Shift)</label>
+        <label><input type="checkbox" name="c_criticalsEnabled"> Criticals Advanced (hotkey F7)</label>
+        <label>Mode Criticals <select name="c_criticalsMode"><option value="mini">Mini-hop</option><option value="jump">Lompat penuh</option></select></label>
+        <label>Cooldown Criticals (100-1000 ms) <input name="c_criticalsCooldownMs" type="number" value="350" min="100" max="1000"></label>
+        <label><input type="checkbox" name="c_noSlowEnabled"> NoSlow Advanced (hotkey F8)</label>
+        <label><input type="checkbox" name="c_noSlowKeepSprint" checked> NoSlow pertahankan sprint saat memakai item</label>
+        <label><input type="checkbox" name="c_autoTotemEnabled"> AutoTotem Advanced (hotkey F9)</label>
+        <label>Ambang HP AutoTotem (1-20) <input name="c_autoTotemHealth" type="number" value="10" min="1" max="20"></label>
+        <label>Jeda AutoTotem (50-1000 ms) <input name="c_autoTotemDelayMs" type="number" value="120" min="50" max="1000"></label>
+        <label><input type="checkbox" name="c_autoTotemAlways"> AutoTotem selalu pasang totem di offhand</label>
+        <label><input type="checkbox" name="c_trajectoriesEnabled"> Trajectories Advanced (hotkey F10)</label>
+        <label>Langkah simulasi Trajectories (20-120) <input name="c_trajectoriesSteps" type="number" value="80" min="20" max="120"></label>
+        <label><input type="checkbox" name="c_nameTagsEnabled"> NameTags Advanced (hotkey [)</label>
+        <label>Jarak NameTags (8-128) <input name="c_nameTagsRange" type="number" value="64" min="8" max="128"></label>
+        <label>Target NameTags <select name="c_nameTagsTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+        <label><input type="checkbox" name="c_nameTagsShowHealth" checked> NameTags tampilkan HP</label>
+        <label><input type="checkbox" name="c_nameTagsShowDistance" checked> NameTags tampilkan jarak</label>
+        <label><input type="checkbox" name="c_invManagerEnabled"> InvManager Advanced (hotkey ])</label>
+        <label>Jeda InvManager (50-1000 ms) <input name="c_invManagerDelayMs" type="number" value="200" min="50" max="1000"></label>
+        <label><input type="checkbox" name="c_invManagerDropDuplicates" checked> InvManager buang duplikat lebih lemah (bukan terenchant)</label>
+        <label><input type="checkbox" name="c_invManagerSortHotbar" checked> InvManager rapikan senjata terbaik ke hotbar pertama</label>
+        <label><input type="checkbox" name="c_autoFishEnabled"> AutoFish Advanced (hotkey -)</label>
+        <label>Jeda lempar ulang AutoFish (200-2000 ms) <input name="c_autoFishRecastMs" type="number" value="600" min="200" max="2000"></label>
+        <label><input type="checkbox" name="c_autoMineEnabled"> AutoMine Advanced (hotkey =)</label>
+        <label><input type="checkbox" name="c_autoMineOreAssist"> AutoMine putar ke ore highlight terdekat (butuh Xray highlight)</label>
+        <label>Jarak pindai ore AutoMine (4-32) <input name="c_autoMineScanRange" type="number" value="16" min="4" max="32"></label>
+        <label>Interval cache entity optimasi (25-250 ms) <input name="c_entityCacheMs" type="number" value="50" min="25" max="250"></label>
+        <label><input type="checkbox" name="c_hudEnabled" checked> HUD PlumClient (hotkey H)</label>
+        <label><input type="checkbox" name="c_showTps" checked> Tampilkan TPS di HUD</label>
+        <label><input type="checkbox" name="c_showFps" checked> Tampilkan FPS</label>
+        <label><input type="checkbox" name="c_showCps" checked> Tampilkan CPS kiri/kanan</label>
+        <label><input type="checkbox" name="c_showPing" checked> Tampilkan ping</label>
+        <label><input type="checkbox" name="c_showCoordinates" checked> Tampilkan koordinat</label>
+        <label><input type="checkbox" name="c_showBiome" checked> Tampilkan biome</label>
+        <label><input type="checkbox" name="c_showCompass" checked> Tampilkan kompas/arah</label>
+        <label><input type="checkbox" name="c_showArmor" checked> Tampilkan durability armor</label>
+        <label><input type="checkbox" name="c_showEffects" checked> Tampilkan efek potion</label>
+        <label><input type="checkbox" name="c_showSession" checked> Tampilkan waktu sesi bermain</label>
+        <label>Blok Xray (satu ID per baris) <textarea name="c_xrayBlocks" rows="4">minecraft:diamond_ore
+minecraft:deepslate_diamond_ore
+minecraft:iron_ore
+minecraft:deepslate_iron_ore
+minecraft:gold_ore
+minecraft:deepslate_gold_ore
+minecraft:ancient_debris</textarea></label>
+        <small class="muted">Pakai hanya di singleplayer/world sendiri/server yang mengizinkan. Server publik bisa menganggap Xray/AutoClick cheat.</small>
+      </fieldset>
+      <button type="submit">Buat instance</button><span id="createMsg" class="msg"></span>
+    </form>
+    <form id="importForm" class="card">
+      <h2>Impor .minecraft yang sudah ada</h2>
+      <label>Nama <input name="name" required maxlength="40"></label>
+      <label>Versi <input name="versionId" required placeholder="Versi instance ini"></label>
+      <label>Folder .minecraft sumber <input name="sourcePath" required placeholder="/home/user/.minecraft"></label>
+      <button type="submit">Impor salinan</button><span id="importMsg" class="msg"></span>
+    </form>
+    <div id="clientStatus" class="card">Memuat status PlumClient…</div>
+    <form id="clientForm" class="card">
+      <h2>Pengaturan PlumClient per instance</h2>
+      <label>Instance <select name="instanceId" id="clientInstanceSelect"></select></label>
+      <label><input type="checkbox" name="xrayEnabled"> Xray (hotkey X di game)</label>
+      <label>Preset kategori Xray <span class="row"><select data-xray-preset><option value="custom">Custom (pakai daftar bawah)</option><option value="precious">Precious</option><option value="redstone">Redstone</option><option value="nether">Nether</option><option value="all">Semua ore</option></select><button type="button" data-xray-apply>Terapkan preset</button></span></label>
+      <label><input type="checkbox" name="xrayHighlight"> Highlight ore terdekat</label>
+      <label>Radius highlight (8-32) <input name="xrayRadius" type="number" min="8" max="32" value="16"></label>
+      <label>Maks highlight (1-12) <input name="xrayMaxHighlights" type="number" min="1" max="12" value="6"></label>
+      <label><input type="checkbox" name="showOreTracker"> Pelacak ore terdekat di HUD</label>
+      <label><input type="checkbox" name="autoBrightEnabled"> AutoBright (hotkey B)</label>
+      <label><input type="checkbox" name="autoClickEnabled"> AutoClick (hotkey V)</label>
+      <label>AutoClick CPS tetap (1-20, bila humanizer mati) <input name="autoClickCps" type="number" min="1" max="20" value="10"></label>
+      <label><input type="checkbox" name="autoClickHumanizer" checked> Humanizer — CPS acak tiap klik (bukan interval tetap)</label>
+      <label>Rentang CPS humanizer (1-20) <span class="row"><input name="autoClickCpsMin" type="number" min="1" max="20" value="8"> – <input name="autoClickCpsMax" type="number" min="1" max="20" value="14"></span></label>
+      <label><input type="checkbox" name="autoClickSmoothAim" checked> Aim smooth + jitter sebelum klik (interpolasi, bukan snap)</label>
+      <label>Jitter aim (0-3 derajat) <input name="autoClickJitter" type="number" min="0" max="3" step="0.1" value="1"></label>
+      <label>Mode AutoClick <select name="autoClickMode"><option value="attack">Attack</option><option value="use">Use</option><option value="both">Keduanya</option></select></label>
+      <label>Target AutoClick <select name="autoClickTarget"><option value="either">Attack + mining</option><option value="entity">Attack saja</option><option value="block">Mining saja</option></select></label>
+      <label><input type="checkbox" name="autoClickCooldownSync"> Ikut cooldown senjata (entity)</label>
+      <label><input type="checkbox" name="autoClickToolGuard"> Proteksi durability tool</label>
+      <label>Batas durability tersisa (1-64) <input name="autoClickMinDurability" type="number" min="1" max="64" value="5"></label>
+      <label><input type="checkbox" name="autoWeaponEnabled"> AutoWeapon (hotkey Z)</label>
+      <label><input type="checkbox" name="autoBowEnabled"> AutoBow (hotkey C)</label>
+      <label>Jarak AutoBow (8-64) <input name="autoBowRange" type="number" min="8" max="64" value="32"></label>
+      <label><input type="checkbox" name="autoBowFullCharge"> AutoBow hanya lepas saat charge penuh</label>
+      <label><input type="checkbox" name="noFallEnabled"> NoFall (hotkey N)</label>
+      <label><input type="checkbox" name="strongholdFinderEnabled"> Stronghold Finder (hotkey G)</label>
+      <label><input type="checkbox" name="crosshairEnabled"> Crosshair kustom (hotkey K)</label>
+      <label>Gaya Crosshair <select name="crosshairStyle"><option value="cross">Cross</option><option value="dot">Dot</option><option value="circle">Circle</option><option value="crossdot">Cross + Dot</option></select></label>
+      <label>Ukuran Crosshair (4-20) <input name="crosshairSize" type="number" min="4" max="20" value="8"></label>
+      <label>Warna Crosshair <select name="crosshairColor"><option value="white">Putih</option><option value="green">Hijau</option><option value="red">Merah</option><option value="cyan">Cyan</option><option value="purple">Ungu</option><option value="yellow">Kuning</option></select></label>
+      <label><input type="checkbox" name="espEnabled"> ESP (hotkey O)</label>
+      <label>Jarak ESP (8-128) <input name="espRange" type="number" min="8" max="128" value="64"></label>
+      <label>Target ESP <select name="espTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+      <label><input type="checkbox" name="tracersEnabled"> Tracers (hotkey P)</label>
+      <label>Jarak Tracers (8-128) <input name="tracerRange" type="number" min="8" max="128" value="64"></label>
+      <label>Target Tracers <select name="tracerTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+      <label><input type="checkbox" name="chestFinderEnabled"> Chest Finder (hotkey U)</label>
+      <label>Radius Chest Finder (8-64) <input name="chestRadius" type="number" min="8" max="64" value="32"></label>
+      <label><input type="checkbox" name="scaffoldEnabled"> Scaffold/AutoBuild (hotkey Y)</label>
+      <label><input type="checkbox" name="autoToolEnabled"> AutoTool mace/trident (hotkey R)</label>
+      <label><input type="checkbox" name="discordRpcEnabled"> Discord Rich Presence</label>
+      <label>Discord App ID <input name="discordAppId" placeholder="17-20 digit"></label>
+      <label><input type="checkbox" name="jesusEnabled"> Jesus (hotkey J)</label>
+      <label><input type="checkbox" name="chestStealerEnabled"> Chest Stealer (hotkey ,)</label>
+      <label><input type="checkbox" name="antiFogEnabled"> AntiFog (hotkey .)</label>
+      <label><input type="checkbox" name="chamsEnabled"> Chams (hotkey M)</label>
+      <label><input type="checkbox" name="triggerbotEnabled"> Triggerbot (hotkey /)</label>
+      <label><input type="checkbox" name="killAuraEnabled"> KillAura Advanced (hotkey I)</label>
+      <label>Jarak serang KillAura (3-6) <input name="killAuraRange" type="number" min="3" max="6" step="0.1" value="4.5"></label>
+      <label>Jarak pindai KillAura (3-12) <input name="killAuraScanRange" type="number" min="3" max="12" step="0.1" value="6"></label>
+      <label>Target KillAura <select name="killAuraTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+      <label>Prioritas KillAura <select name="killAuraPriority"><option value="distance">Jarak terdekat</option><option value="health">Health terendah</option><option value="angle">Sudut terkecil</option><option value="hurttime">Hurt-time terendah</option></select></label>
+      <label>Mode KillAura <select name="killAuraMode"><option value="single">Single (fokus satu)</option><option value="switch">Switch (berganti berkala)</option><option value="multi">Multi (bergiliran tiap serangan)</option></select></label>
+      <label>Jeda ganti target Switch (0-2000 ms) <input name="killAuraSwitchDelayMs" type="number" min="0" max="2000" value="250"></label>
+      <label>FOV KillAura (30-360) <input name="killAuraFov" type="number" min="30" max="360" value="120"></label>
+      <label>Kecepatan rotasi KillAura (10-180 °/tick) <input name="killAuraRotationSpeed" type="number" min="10" max="180" value="60"></label>
+      <label>Batas CPS KillAura (1-20) <input name="killAuraCps" type="number" min="1" max="20" value="12"></label>
+      <label><input type="checkbox" name="killAuraThroughWalls"> KillAura boleh menyerang tembus dinding</label>
+      <label><input type="checkbox" name="killAuraIgnoreInvisible"> KillAura abaikan entity invisible</label>
+      <label><input type="checkbox" name="killAuraSmartCrit"> KillAura smart-crit (tunggu jatuh saat di udara)</label>
+      <label><input type="checkbox" name="killAuraRequireCooldown"> KillAura tunggu cooldown senjata penuh</label>
+      <label><input type="checkbox" name="velocityEnabled"> Velocity Advanced (hotkey L)</label>
+      <label>Mode Velocity <select name="velocityMode"><option value="reduce">Reduce (skala persen)</option><option value="cancel">Cancel (nol)</option></select></label>
+      <label>Velocity horizontal dipertahankan (0-100%) <input name="velocityHorizontal" type="number" min="0" max="100" value="20"></label>
+      <label>Velocity vertikal dipertahankan (0-100%) <input name="velocityVertical" type="number" min="0" max="100" value="100"></label>
+      <label>Delay Velocity (0-10 tick) <input name="velocityDelayTicks" type="number" min="0" max="10" value="0"></label>
+      <label><input type="checkbox" name="velocityJumpReset"> Velocity jump-reset saat terkena knockback di tanah</label>
+      <label>Peluang jump-reset (1-100%) <input name="velocityJumpResetChance" type="number" min="1" max="100" value="30"></label>
+      <label><input type="checkbox" name="velocityRequireMoving"> Velocity hanya saat sedang bergerak</label>
+      <label><input type="checkbox" name="sprintEnabled"> Sprint Advanced (hotkey ;)</label>
+      <label>Mode Sprint <select name="sprintMode"><option value="legit">Legit (maju saja)</option><option value="omni">Omni (semua arah)</option></select></label>
+      <label><input type="checkbox" name="sprintKeepSprint"> Sprint keep-sprint setelah menyerang</label>
+      <label><input type="checkbox" name="sprintWhileUsing"> Sprint tetap jalan saat memakai item</label>
+      <label><input type="checkbox" name="autoArmorEnabled"> AutoArmor Advanced (hotkey ')</label>
+      <label>Jeda AutoArmor (50-1000 ms) <input name="autoArmorDelayMs" type="number" min="50" max="1000" value="150"></label>
+      <label><input type="checkbox" name="autoArmorHotbarOnly"> AutoArmor hanya dari hotbar</label>
+      <label><input type="checkbox" name="autoArmorPreferElytra"> AutoArmor utamakan elytra daripada chestplate</label>
+      <label><input type="checkbox" name="autoArmorDropOld"> AutoArmor buang potongan lama (bukan disimpan)</label>
+      <label><input type="checkbox" name="freecamEnabled"> Freecam Advanced (hotkey F6)</label>
+      <label>Kecepatan Freecam (0.2-3) <input name="freecamSpeed" type="number" min="0.2" max="3" step="0.1" value="1"></label>
+      <label><input type="checkbox" name="freecamFreeze"> Freecam bekukan pemain di tempat</label>
+      <label><input type="checkbox" name="freecamShowPlayer"> Freecam tampilkan badan pemain (third-person)</label>
+      <label><strong>Upgrade Advanced modul lama</strong></label>
+      <label><input type="checkbox" name="jesusAffectWater"> Jesus berlaku di air</label>
+      <label><input type="checkbox" name="jesusAffectLava"> Jesus berlaku di lava</label>
+      <label>Daya angkat Jesus (0.03-0.2) <input name="jesusLift" type="number" min="0.03" max="0.2" step="0.01" value="0.08"></label>
+      <label><input type="checkbox" name="xrayExposedOnly"> Xray hanya ore terbuka (sentuh udara)</label>
+      <label><input type="checkbox" name="xrayValuableFirst"> Xray utamakan ore berharga di pelacak</label>
+      <label>Gamma AutoBright (1-15) <input name="autoBrightGamma" type="number" min="1" max="15" step="0.5" value="15"></label>
+      <label><input type="checkbox" name="autoBrightFade"> AutoBright transisi gamma halus</label>
+      <label>Rentang CPS Use AutoClick (1-20) <span class="row"><input name="autoClickUseCpsMin" type="number" min="1" max="20" value="8"> – <input name="autoClickUseCpsMax" type="number" min="1" max="20" value="14"></span></label>
+      <label>Jeda ganti senjata AutoWeapon (0-1000 ms) <input name="autoWeaponSwitchDelayMs" type="number" min="0" max="1000" value="150"></label>
+      <label><input type="checkbox" name="autoWeaponEnchantWeight"> AutoWeapon timbang enchantment per jenis</label>
+      <label><input type="checkbox" name="autoBowPredictive"> AutoBow aim prediktif (lead target)</label>
+      <label>Jarak jatuh minimum NoFall (2-12) <input name="noFallMinDistance" type="number" min="2" max="12" value="3"></label>
+      <label>Interval paket NoFall (50-500 ms) <input name="noFallIntervalMs" type="number" min="50" max="500" value="100"></label>
+      <label>Jarak minimum antar lemparan Stronghold (4-32) <input name="strongholdMinSeparation" type="number" min="4" max="32" value="8"></label>
+      <label><input type="checkbox" name="crosshairDynamic"> Crosshair dinamis mengikuti cooldown</label>
+      <label><input type="checkbox" name="crosshairHitMarker"> Crosshair merah saat bidik entity hidup</label>
+      <label><input type="checkbox" name="espShowHealth"> ESP tampilkan bar HP entity</label>
+      <label>Ketebalan garis Tracers (1-4) <input name="tracerThickness" type="number" min="1" max="4" value="2"></label>
+      <label><input type="checkbox" name="tracerVisibleOnly"> Tracers hanya entity terlihat (garis pandang)</label>
+      <label>Tipe Chest Finder <select name="chestFinderTypes"><option value="all">Semua kontainer</option><option value="chests">Chest saja</option><option value="barrels">Barrel saja</option><option value="shulkers">Shulker saja</option></select></label>
+      <label>Jeda pasang Scaffold (50-500 ms) <input name="scaffoldDelayMs" type="number" min="50" max="500" value="100"></label>
+      <label><input type="checkbox" name="scaffoldTower"> Scaffold mode tower (tahan lompat)</label>
+      <label>Jeda ganti tool AutoTool (0-500 ms) <input name="autoToolSwitchDelayMs" type="number" min="0" max="500" value="100"></label>
+      <label><input type="checkbox" name="autoToolPreferSilk"> AutoTool utamakan silk touch</label>
+      <label><input type="checkbox" name="discordShowModules"> Discord RPC tampilkan jumlah modul aktif</label>
+      <label>Jeda Chest Stealer (25-500 ms) <input name="chestStealerDelayMs" type="number" min="25" max="500" value="75"></label>
+      <label><input type="checkbox" name="chestStealerValuableOnly"> Chest Stealer hanya item berharga</label>
+      <label>Mode AntiFog <select name="antiFogMode"><option value="full">Full (kabut hilang)</option><option value="partial">Partial (jarak didorong)</option></select></label>
+      <label>Faktor jarak AntiFog partial (2-10) <input name="antiFogFactor" type="number" min="2" max="10" value="4"></label>
+      <label><input type="checkbox" name="chamsTint"> Chams tint merah</label>
+      <label>Target Triggerbot <select name="triggerbotTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+      <label>Delay Triggerbot (0-500 ms) <span class="row"><input name="triggerbotDelayMinMs" type="number" min="0" max="500" value="0"> – <input name="triggerbotDelayMaxMs" type="number" min="0" max="500" value="80"></span></label>
+      <label><input type="checkbox" name="hudActiveOnly"> HUD ringkas (hanya modul aktif)</label>
+      <label>Cari setting <input type="search" data-client-search placeholder="Ketik nama modul/setting…"></label>
+      <label><strong>ClickGUI + modul baru + optimasi</strong></label>
+      <label><input type="checkbox" name="clickGuiEnabled"> ClickGUI in-game aktif (Right Shift)</label>
+      <label><input type="checkbox" name="criticalsEnabled"> Criticals Advanced (hotkey F7)</label>
+      <label>Mode Criticals <select name="criticalsMode"><option value="mini">Mini-hop</option><option value="jump">Lompat penuh</option></select></label>
+      <label>Cooldown Criticals (100-1000 ms) <input name="criticalsCooldownMs" type="number" min="100" max="1000" value="350"></label>
+      <label><input type="checkbox" name="noSlowEnabled"> NoSlow Advanced (hotkey F8)</label>
+      <label><input type="checkbox" name="noSlowKeepSprint"> NoSlow pertahankan sprint saat memakai item</label>
+      <label><input type="checkbox" name="autoTotemEnabled"> AutoTotem Advanced (hotkey F9)</label>
+      <label>Ambang HP AutoTotem (1-20) <input name="autoTotemHealth" type="number" min="1" max="20" value="10"></label>
+      <label>Jeda AutoTotem (50-1000 ms) <input name="autoTotemDelayMs" type="number" min="50" max="1000" value="120"></label>
+      <label><input type="checkbox" name="autoTotemAlways"> AutoTotem selalu pasang totem di offhand</label>
+      <label><input type="checkbox" name="trajectoriesEnabled"> Trajectories Advanced (hotkey F10)</label>
+      <label>Langkah simulasi Trajectories (20-120) <input name="trajectoriesSteps" type="number" min="20" max="120" value="80"></label>
+      <label><input type="checkbox" name="nameTagsEnabled"> NameTags Advanced (hotkey [)</label>
+      <label>Jarak NameTags (8-128) <input name="nameTagsRange" type="number" min="8" max="128" value="64"></label>
+      <label>Target NameTags <select name="nameTagsTargets"><option value="hostile">Hostile saja</option><option value="players">Pemain</option><option value="creatures">Hewan/pasif</option><option value="all">Semua entity hidup</option></select></label>
+      <label><input type="checkbox" name="nameTagsShowHealth"> NameTags tampilkan HP</label>
+      <label><input type="checkbox" name="nameTagsShowDistance"> NameTags tampilkan jarak</label>
+      <label><input type="checkbox" name="invManagerEnabled"> InvManager Advanced (hotkey ])</label>
+      <label>Jeda InvManager (50-1000 ms) <input name="invManagerDelayMs" type="number" min="50" max="1000" value="200"></label>
+      <label><input type="checkbox" name="invManagerDropDuplicates"> InvManager buang duplikat lebih lemah (bukan terenchant)</label>
+      <label><input type="checkbox" name="invManagerSortHotbar"> InvManager rapikan senjata terbaik ke hotbar pertama</label>
+      <label><input type="checkbox" name="autoFishEnabled"> AutoFish Advanced (hotkey -)</label>
+      <label>Jeda lempar ulang AutoFish (200-2000 ms) <input name="autoFishRecastMs" type="number" min="200" max="2000" value="600"></label>
+      <label><input type="checkbox" name="autoMineEnabled"> AutoMine Advanced (hotkey =)</label>
+      <label><input type="checkbox" name="autoMineOreAssist"> AutoMine putar ke ore highlight terdekat (butuh Xray highlight)</label>
+      <label>Jarak pindai ore AutoMine (4-32) <input name="autoMineScanRange" type="number" min="4" max="32" value="16"></label>
+      <label>Interval cache entity optimasi (25-250 ms) <input name="entityCacheMs" type="number" min="25" max="250" value="50"></label>
+      <label><input type="checkbox" name="hudEnabled"> HUD (hotkey H)</label>
+      <label><input type="checkbox" name="showTps"> Tampilkan TPS</label>
+      <label><input type="checkbox" name="showFps"> Tampilkan FPS</label>
+      <label><input type="checkbox" name="showCps"> Tampilkan CPS kiri/kanan</label>
+      <label><input type="checkbox" name="showPing"> Tampilkan ping</label>
+      <label><input type="checkbox" name="showCoordinates"> Tampilkan koordinat</label>
+      <label><input type="checkbox" name="showBiome"> Tampilkan biome</label>
+      <label><input type="checkbox" name="showCompass"> Tampilkan kompas/arah</label>
+      <label><input type="checkbox" name="showArmor"> Tampilkan durability armor</label>
+      <label><input type="checkbox" name="showEffects"> Tampilkan efek potion</label>
+      <label><input type="checkbox" name="showSession"> Tampilkan waktu sesi bermain</label>
+      <label>Blok Xray <textarea name="xrayBlocks" rows="5"></textarea></label>
+      <h3>Toggle cepat (tanpa hotkey)</h3>
+      <div id="quickToggles" class="row"></div>
+      <p class="muted">Klik chip untuk menyalakan/mematikan fitur langsung. Berlaku live (±1 detik) bila game sedang berjalan, karena mod memuat ulang <code>config/plumclient.json</code> otomatis; bila game mati, berlaku saat Play berikutnya. Pengaturan detail tetap lewat form di atas lalu Simpan.</p>
+      <button type="submit">Simpan pengaturan client</button><span id="clientMsg" class="msg"></span>
+      <p class="muted">Disimpan ke instance dan ditulis ke <code>config/plumclient.json</code>. Berlaku penuh saat Play berikutnya; hotkey mengubah sesi yang sedang berjalan.</p>
+    </form>
+    <div id="instanceList" class="grid"></div>
+  </section>
+
+  <section id="view-diagnostics" hidden>
+    <div class="bar"><button id="runDiag">Jalankan diagnostik</button><button id="checkUpdate">Cek update launcher</button></div>
+    <div id="diagOut"></div>
+    <pre id="logOut" class="logs"></pre>
+  </section>
+</main>
+
+<dialog id="jobDialog"><h3 id="jobTitle">Mengunduh…</h3><progress id="jobBar" max="100" value="0"></progress><p id="jobDetail" class="muted"></p><button onclick="document.getElementById('jobDialog').close()">Tutup (lanjut di latar)</button></dialog>
+<script src="/app.js"></script>
+</body></html>

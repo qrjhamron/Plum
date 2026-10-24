@@ -1,0 +1,6 @@
+node_modules/
+data/
+client-mod/build/
+src-tauri/target/
+src-tauri/resources/engine/node.exe
+src-tauri/resources/engine/app/

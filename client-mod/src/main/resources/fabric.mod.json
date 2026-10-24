@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "plumclient",
+  "version": "${version}",
+  "name": "PlumClient",
+  "description": "Client PlumCraft: Xray, AutoBright, AutoClick, AutoWeapon, AutoBow, NoFall, Stronghold Finder, Crosshair kustom, ESP, Tracers, Chest Finder, Scaffold, AutoTool mace/trident, Discord Rich Presence, Jesus, Chest Stealer, AntiFog, Chams, Triggerbot, KillAura, Velocity, Sprint, AutoArmor, Freecam, dan HUD TPS/FPS. Gunakan hanya di singleplayer, world sendiri, atau server yang mengizinkan.",
+  "authors": ["PlumCraft"],
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["id.plumcraft.client.PlumClientMod"]
+  },
+  "mixins": ["plumclient.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21"
+  }
+}
